@@ -6,19 +6,20 @@ import click
 import flask
 from flask_cors import CORS
 
-from concentration.model import ConcentrationModel
+from concentration import logger
+from concentration.model import Model
+from concentration.redis_model import RedisModel
 
+logger = logger.get_logger(__name__, "debug")
 
 DAO_IDENTIFIER = None
 MODEL = None
+MODEL_CONSTRUCTOR = RedisModel
 
 
 app = flask.Flask(__name__)
 # This is to handle inside WSL to outside looking like a cross server request
 CORS(app)
-
-
-app.logger.info('Loading model.')
 
 # The face up card indices
 INDICES_UP = []
@@ -46,9 +47,9 @@ def reset() -> flask.Response:
     # Specify global scope if going to change the value of a global variable.
     global MODEL, INDICES_UP, GUESSES
 
-    app.logger.info('Resetting game.')
+    logger.info('Resetting game.')
 
-    MODEL = ConcentrationModel(dao_identifier=DAO_IDENTIFIER)
+    MODEL = MODEL_CONSTRUCTOR()
     INDICES_UP = []
     GUESSES = 0
 
@@ -79,6 +80,8 @@ def select(index: int) -> flask.Response:
     """
     # Specify global scope if going to change the value of a global variable.
     global MODEL, INDICES_UP, GUESSES
+
+    logger.info(f'Selecting card. {index}')
 
     if len(INDICES_UP) == 2:
         INDICES_UP = []
@@ -131,14 +134,12 @@ def get_guesses() -> flask.Response:
 
 
 @click.command()
-@click.option('--dao-identifier', default=None)
 @click.option('--debug', is_flag=True, default=False)
-def run(dao_identifier: Optional[str] = None, debug: Optional[bool] = False) -> None:
-    global MODEL, DAO_IDENTIFIER
-    DAO_IDENTIFIER = dao_identifier
-    MODEL = ConcentrationModel(dao_identifier=DAO_IDENTIFIER)
+def run(debug: Optional[bool] = False) -> None:
+    global MODEL
+    MODEL = MODEL_CONSTRUCTOR()
+    logger.info("modelled")
     app.run(host="0.0.0.0", port=5000, debug=debug)
-
 
 if __name__ == '__main__':
     run()
