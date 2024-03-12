@@ -14,7 +14,6 @@ logger = logger.get_logger(__name__, "debug")
 
 DAO_IDENTIFIER = None
 MODEL = None
-MODEL_CONSTRUCTOR = RedisModel
 
 
 app = flask.Flask(__name__)
@@ -134,12 +133,15 @@ def get_guesses() -> flask.Response:
 
 
 @click.command()
-@click.option('--debug', is_flag=True, default=False)
-def run(debug: Optional[bool] = False) -> None:
+@click.option('--redis', is_flag=True, default=False)
+def run(redis: Optional[bool] = False) -> None:
     global MODEL
-    MODEL = MODEL_CONSTRUCTOR()
+    if redis:
+        MODEL = RedisModel()
+    else:
+        MODEL = Model()
     logger.info("modelled")
-    app.run(host="0.0.0.0", port=5000, debug=debug)
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
 if __name__ == '__main__':
     run()

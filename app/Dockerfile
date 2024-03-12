@@ -19,5 +19,5 @@ RUN pip3 install -r requirements.txt
 EXPOSE 5000
 
 # Set the entry point command to run the Flask app
-CMD ["python3", "controller.py", "--dao-identifier", "redis"]
+CMD ["python3", "app.py"]
 
