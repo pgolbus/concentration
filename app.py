@@ -1,44 +1,24 @@
 from __future__ import annotations
 
-import logging
-import sys
 from typing import Optional
 
 import click
 import flask
 from flask_cors import CORS
 
-from model import ConcentrationModel
+from concentration.model import ConcentrationModel
 
-
-APP = flask.Flask(__name__)
-CORS(APP)
-
-LOGGER = logging.getLogger()
-
-LOGGER.info('Loading model.')
 
 DAO_IDENTIFIER = None
 MODEL = None
-APP = flask.Flask(__name__)
-CORS(APP)
-
-LOGGER = logging.getLogger()
-# Set logger to handle STDERR.
-HANDLER = logging.StreamHandler(sys.stderr)
-# Format the log messages.
-FORMATTER = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-HANDLER.setFormatter(FORMATTER)
-# Attach the STDERR handler to the logger.
-LOGGER.addHandler(HANDLER)
-# Set log level to debug
-# LOGGER.setLevel(logging.DEBUG)
 
 
-LOGGER.info('Loading model.')
+app = flask.Flask(__name__)
+# This is to handle inside WSL to outside looking like a cross server request
+CORS(app)
 
-DAO_IDENTIFIER = None
-MODEL = None
+
+app.logger.info('Loading model.')
 
 # The face up card indices
 INDICES_UP = []
@@ -47,7 +27,7 @@ INDICES_UP = []
 GUESSES = 0
 
 
-@APP.route('/health', methods=['GET'])
+@app.route('/health', methods=['GET'])
 def health() -> flask.Response:
     """Health check.
 
@@ -58,7 +38,7 @@ def health() -> flask.Response:
     return flask.make_response(data, 200)
 
 
-@APP.route('/reset', methods=['POST'])
+@app.route('/reset', methods=['POST'])
 def reset() -> flask.Response:
     """Reset game.
 
@@ -66,7 +46,7 @@ def reset() -> flask.Response:
     # Specify global scope if going to change the value of a global variable.
     global MODEL, INDICES_UP, GUESSES
 
-    APP.logger.info('Resetting game.')
+    app.logger.info('Resetting game.')
 
     MODEL = ConcentrationModel(dao_identifier=DAO_IDENTIFIER)
     INDICES_UP = []
@@ -78,7 +58,7 @@ def reset() -> flask.Response:
     return flask.make_response(data, 200)
 
 
-@APP.route('/card/<int:index>', methods=['GET'])
+@app.route('/card/<int:index>', methods=['GET'])
 def card(index: int) -> flask.Response:
     """Get card info.
 
@@ -92,7 +72,7 @@ def card(index: int) -> flask.Response:
     return flask.make_response(data, 200)
 
 
-@APP.route('/select/<int:index>', methods=['POST'])
+@app.route('/select/<int:index>', methods=['POST'])
 def select(index: int) -> flask.Response:
     """Select a card.
 
@@ -139,7 +119,7 @@ def select(index: int) -> flask.Response:
     return flask.make_response(data, 200)
 
 
-@APP.route('/guesses', methods=['GET'])
+@app.route('/guesses', methods=['GET'])
 def get_guesses() -> flask.Response:
     """Select a card.
     """
@@ -152,11 +132,12 @@ def get_guesses() -> flask.Response:
 
 @click.command()
 @click.option('--dao-identifier', default=None)
-def run(dao_identifier: Optional[str] = None) -> None:
+@click.option('--debug', is_flag=True, default=False)
+def run(dao_identifier: Optional[str] = None, debug: Optional[bool] = False) -> None:
     global MODEL, DAO_IDENTIFIER
     DAO_IDENTIFIER = dao_identifier
     MODEL = ConcentrationModel(dao_identifier=DAO_IDENTIFIER)
-    APP.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=debug)
 
 
 if __name__ == '__main__':

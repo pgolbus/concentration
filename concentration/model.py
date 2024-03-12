@@ -5,9 +5,9 @@ import random
 import requests
 from typing import List, Optional
 
-from concentration_daos import RedisConcentrationDao as RedisDao
-from concentration_daos import SQLiteConcentrationDao as SQLiteDao
-from concentration_daos import DummyConcentrationDao as DummyDao
+from .daos import RedisConcentrationDao as RedisDao
+from .daos import SQLiteConcentrationDao as SQLiteDao
+from .daos import DummyConcentrationDao as DummyDao
 
 
 class ConcentrationModel:

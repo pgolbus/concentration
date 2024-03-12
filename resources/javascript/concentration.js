@@ -1,5 +1,5 @@
-const API_URL = 'http://127.0.0.1:37615/'
-const IMAGES_FOLDER = 'images/'
+const API_URL = 'http://172.18.4.181:5000/'
+const IMAGES_FOLDER = 'resources/images/'
 
 /**
  * API call: POST request to reset the game.
