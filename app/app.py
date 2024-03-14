@@ -12,8 +12,8 @@ from concentration.redis_model import RedisModel
 
 logger = logger.get_logger(__name__, "debug")
 
-DAO_IDENTIFIER = None
 MODEL = None
+MODEL_CONSTRUCTOR = None
 
 
 app = flask.Flask(__name__)
@@ -135,11 +135,12 @@ def get_guesses() -> flask.Response:
 @click.command()
 @click.option('--redis', is_flag=True, default=False)
 def run(redis: Optional[bool] = False) -> None:
-    global MODEL
+    global MODEL, MODEL_CONSTRUCTOR
     if redis:
-        MODEL = RedisModel()
+        MODEL_CONSTRUCTOR = RedisModel
     else:
-        MODEL = Model()
+        MODEL_CONSTRUCTOR = Model
+    MODEL = MODEL_CONSTRUCTOR()
     logger.info("modelled")
     app.run(host="0.0.0.0", port=5000, debug=True)
 

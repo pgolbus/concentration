@@ -1,4 +1,4 @@
-const API_URL = 'http://172.18.4.181:5000/'
+const API_URL = 'http://localhost:5000/'
 const IMAGES_FOLDER = 'resources/images/'
 
 /**

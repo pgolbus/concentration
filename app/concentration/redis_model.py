@@ -50,10 +50,10 @@ class RedisModel(Model):
             A Redis connection.
 
         """
-        # redis_hostname = "localhost"
-        # redis_port = 6379
-        redis_hostname = os.getenv("REDIS_HOSTNAME")
-        redis_port = os.getenv("REDIS_PORT")
+        redis_hostname = "localhost"
+        redis_port = 6379
+        # redis_hostname = os.getenv("REDIS_HOSTNAME")
+        # redis_port = os.getenv("REDIS_PORT")
         self._logger.debug(f"Connecting to {redis_hostname} on port {redis_port} w/ db {db}.")
         return redis.Redis(host=redis_hostname, port=redis_port, db=db, decode_responses=True)
 
