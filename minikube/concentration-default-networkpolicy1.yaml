@@ -8,9 +8,3 @@ spec:
   podSelector:
     matchLabels:
       io.kompose.network/concentration-default: "true"
-  # also let these pods be reachable from outside the network
-  ingress:
-  - from:
-      - podSelector:
-          matchLabels:
-            io.kompose.network/concentration-default: "true"
